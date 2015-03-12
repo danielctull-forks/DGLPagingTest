@@ -48,21 +48,34 @@ static CGFloat const LayoutRightInset = 150.0f;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-
 	UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
-
-	CGSize size = self.collectionView.bounds.size;
-	size.width -= (LayoutLeftInset + LayoutRightInset);
-	size.width /= 2;
-	attributes.size = size;
-
-	NSLog(@"%@:%@ %@", self, NSStringFromSelector(_cmd), NSStringFromCGSize(size));
-
+	attributes.size = self.pageSize;
 	return attributes;
 }
 
-//- (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
-//	return proposedContentOffset;
-//}
+- (CGSize)pageSize {
+	CGSize size = self.collectionView.bounds.size;
+	size.width -= (LayoutLeftInset + LayoutRightInset);
+	size.width /= 2;
+	return size;
+}
+
+- (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
+
+	CGFloat pageWidth = self.pageSize.width;
+
+
+	CGFloat mod = (NSInteger)proposedContentOffset.x % (NSInteger)pageWidth;
+	proposedContentOffset.x -= mod;
+
+	if (mod > pageWidth / 2) {
+		proposedContentOffset.x += pageWidth;
+	}
+
+
+
+	NSLog(@"%@:%@ %@", self, NSStringFromSelector(_cmd), NSStringFromCGPoint(proposedContentOffset));
+	return proposedContentOffset;
+}
 
 @end
